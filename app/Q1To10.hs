@@ -32,8 +32,8 @@ myLast = head . reverse
 -- myLast = foldl1 (curry snd)
 
 -- 2
--- myButLast :: [a] -> a
--- myButLast = last . init
+myButLast :: [a] -> a
+myButLast = last . init
 
 -- -- Generic type constraint:
 -- -- Since `fold` takes anything that's `Foldable`, we could use a generic type constraint
@@ -53,3 +53,41 @@ myLast = head . reverse
 -- Essentially the same comparing to the method above, but doesn't throw an error.
 myButLastSafe :: (Foldable f) => f a -> Maybe a
 myButLastSafe = fst . foldl (\(_, b) x -> (b, Just x)) (Nothing, Nothing)
+
+-- 3
+-- NOTE: use 1-based index
+--
+-- Haskell uses `Int` to index linked lists
+-- https://stackoverflow.com/questions/12432154/int-vs-word-in-common-use#comment16715337_12432154
+-- elementAt :: [a] -> Int -> a
+-- elementAt xs i = xs !! (i - 1)
+
+-- -- Recursive solution
+-- elementAt :: [a] -> Int -> a
+-- elementAt (x : xs) k
+--   | k == 1 = x
+--   | k < 1 = error "Index out of bounds"
+--   | otherwise = elementAt xs (k - 1)
+-- elementAt _ _ = error "Index out of bounds"
+
+-- -- `zip`
+-- -- `zip` truncates the longer list
+-- elementAt :: [a] -> Int -> a
+-- elementAt xs n
+--   | length xs < n = error "Index out of bounds"
+--   | otherwise = fst . last $ zip xs [1 .. n]
+
+-- Partial application of the composition function:
+-- Only supplying the first argument of the composition function,
+-- and then compose the partial composed function to the rest.
+elementAt :: [a] -> Int -> a
+elementAt = (last .) . flip take
+
+-- -- "blackbird operator"
+-- -- https://drewboardman.github.io/jekyll/update/2020/01/14/blackbird-operator.html
+-- -- VERY terse syntax. Learn it, but never use it.
+-- (.:) :: (c -> d) -> (a -> b -> c) -> a -> b -> d
+-- (.:) = (.) . (.)
+--
+-- elementAt :: [a] -> Int -> a
+-- elementAt = last .: flip take
