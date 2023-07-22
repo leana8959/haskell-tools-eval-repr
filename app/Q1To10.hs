@@ -85,9 +85,39 @@ elementAt = (last .) . flip take
 
 -- -- "blackbird operator"
 -- -- https://drewboardman.github.io/jekyll/update/2020/01/14/blackbird-operator.html
--- -- VERY terse syntax. Learn it, but never use it.
+-- -- VERY terse syntax. Learn it but don't use it.
 -- (.:) :: (c -> d) -> (a -> b -> c) -> a -> b -> d
 -- (.:) = (.) . (.)
 --
 -- elementAt :: [a] -> Int -> a
 -- elementAt = last .: flip take
+
+-- 4
+-- Recursive
+-- myLength :: [a] -> Int
+-- myLength [] = 0
+-- myLength (x : xs) = 1 + myLength xs
+
+-- -- `fold` with the accumulator a counter `c`
+-- myLength :: [a] -> Int
+-- myLength = foldl (\c _ -> c + 1) 0
+
+-- Using partial application, consume the first argument (accumulator) and increment it,
+-- and then consume the second one without doing (element of the list).
+-- This is a pointless notation, i.e. has no explicit parameter.
+myLength :: [a] -> Int
+myLength = foldl (const . (+ 1)) 0
+
+-- -- Interesting solution
+-- -- Map all content to 1 and sum the list
+-- myLength :: [a] -> Int
+-- myLength = sum . map (const 1)
+
+-- -- 7
+-- -- NOTE: We have to define a new data type, because lists in Haskell are homogeneous.
+-- data NestedList a = Elem a | List [NestedList a]
+--
+-- flatten :: NestedList a -> [a]
+-- flatten (Elem x) = [x]
+-- flatten (List []) = []
+-- flatten (List (x : xs)) = flatten x ++ flatten (List xs)
