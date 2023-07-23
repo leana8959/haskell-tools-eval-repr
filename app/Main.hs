@@ -3,5 +3,7 @@
 
 module Main where
 
+-- >>> head [1,2]
+
 main :: IO ()
 main = putStrLn "Hello, Haskell!"
