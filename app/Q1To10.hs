@@ -113,11 +113,59 @@ myLength = foldl (const . (+ 1)) 0
 -- myLength :: [a] -> Int
 -- myLength = sum . map (const 1)
 
+-- -- 4
+-- -- More efficient as it pushes to the front of the list
+-- myReverse :: [a] -> [a]
+-- myReverse = foldl (flip (:)) []
+
+-- Recursive method
+-- We can only match on the left side of the list
+-- which means we can only construct the list from the right (reversed).
+-- This is less efficient because Haskell's lists are linked lists.
+myReverse :: [a] -> [a]
+myReverse [] = []
+myReverse (x : xs) = myReverse xs ++ [x]
+
+-- 5
+-- -- A palindrome is equal to the reverse of itself.
+-- isPalindrome :: (Eq a) => [a] -> Bool
+-- isPalindrome xs = xs == reverse xs
+
+-- -- Using >>=
+-- -- `>>=` has (is) an instance `Monad ((->) r)`
+-- -- It has a type signature: `(>>=) :: (r -> a) -> (a -> r -> b) -> r -> b`
+-- --
+-- -- `>>=` is infix 1: `reverse` is (r -> a). `==` is (a -> r -> b).
+-- -- With `a == b`.
+-- --
+-- -- `a` in the type signatrue is never truely aquired.
+-- isPalindrome :: (Eq a) => [a] -> Bool
+-- isPalindrome = reverse >>= (==)
+
 -- -- 7
--- -- NOTE: We have to define a new data type, because lists in Haskell are homogeneous.
--- data NestedList a = Elem a | List [NestedList a]
+-- NOTE: We have to define a new data type, because lists in Haskell are homogeneous.
+data NestedList a = Elem a | List [NestedList a]
+
 --
 -- flatten :: NestedList a -> [a]
 -- flatten (Elem x) = [x]
 -- flatten (List []) = []
 -- flatten (List (x : xs)) = flatten x ++ flatten (List xs)
+
+-- -- `concatMap`
+-- -- `map` all elements of xs with the function flatten, and then concat all of the results
+-- flatten :: NestedList a -> [a]
+-- flatten (Elem x) = [x]
+-- flatten (List xs) = concatMap flatten xs
+
+-- `>>=`
+-- `>>=` applies the function on the rhs to the monoid on the lhs.
+-- flatten :: NestedList a -> [a]
+-- flatten (Elem x) = return x
+-- flatten (List xs) = xs >>= flatten
+
+-- Map each element of the structure into a monoid, and combine the results with  `( <> )`.
+-- This fold is right-associative (i.e. `foldr`) and lazy in the accumulator.
+flatten :: NestedList a -> [a]
+flatten (Elem x) = [x]
+flatten (List xs) = foldMap flatten xs
