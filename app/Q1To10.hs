@@ -113,7 +113,7 @@ myLength = foldl (const . (+ 1)) 0
 -- myLength :: [a] -> Int
 -- myLength = sum . map (const 1)
 
--- -- 4
+-- -- 5
 -- -- More efficient as it pushes to the front of the list
 -- myReverse :: [a] -> [a]
 -- myReverse = foldl (flip (:)) []
@@ -126,7 +126,7 @@ myReverse :: [a] -> [a]
 myReverse [] = []
 myReverse (x : xs) = myReverse xs ++ [x]
 
--- 5
+-- 6
 -- -- A palindrome is equal to the reverse of itself.
 -- isPalindrome :: (Eq a) => [a] -> Bool
 -- isPalindrome xs = xs == reverse xs
